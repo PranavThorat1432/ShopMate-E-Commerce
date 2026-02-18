@@ -1,4 +1,6 @@
 import pkg from 'pg';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const { Client } = pkg;
 
@@ -6,7 +8,7 @@ const database = new Client({
     user: 'postgres',
     host: 'localhost',
     database: 'ShopMate_Ecommerce',
-    password: 'mern',
+    password: process.env.DB_PASS,
     port: 5432,
 });
 
