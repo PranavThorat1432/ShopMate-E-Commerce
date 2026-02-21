@@ -19,4 +19,4 @@ export async function createPaymentsTable() {
         console.error("❌ Failed To Create Payments Table.", error);
         process.exit(1);
     }
-};
+}; 
