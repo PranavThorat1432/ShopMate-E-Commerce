@@ -454,12 +454,19 @@ export const fetchAIFilteredProducts = catchAsyncErrors(async (req, res, next) =
         }
 
         // STEP: 2 - AI Filtering 
-        const {success, products} = await getAIRecommendation(req, res, userPrompt, filteredProducts);
+        const aiResult = await getAIRecommendation(userPrompt, filteredProducts);
+        
+        if(!aiResult.success) {
+            return res.status(400).json({
+                success: false,
+                message: aiResult.message || 'AI filtering failed'
+            });
+        }
 
         res.status(200).json({
             success: true,
             message: 'AI Filtered Products Fetched!',
-            products
+            products: aiResult.products
         })
 
     } catch (error) {
