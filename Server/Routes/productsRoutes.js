@@ -1,6 +1,6 @@
 import express from 'express';
 import { authorizedRoles, isAuth } from '../Middlewares/isAuth.js';
-import { createProduct, deleteProduct, deleteReview, fetchAllProducts, fetchSingleProduct, postProductReview, updateProduct } from '../Controllers/productController.js';
+import { createProduct, deleteProduct, deleteReview, fetchAIFilteredProducts, fetchAllProducts, fetchSingleProduct, postProductReview, updateProduct } from '../Controllers/productController.js';
 
 const productRouter = express.Router();
 
@@ -11,5 +11,6 @@ productRouter.delete('/admin/delete-product/:productId', isAuth, authorizedRoles
 productRouter.get('/single-product/:productId', fetchSingleProduct);
 productRouter.put('/post-review/:productId', isAuth, postProductReview);
 productRouter.delete('/delete-review/:productId', isAuth, deleteReview);
+productRouter.post('/ai-search', isAuth, fetchAIFilteredProducts)
 
 export default productRouter;
