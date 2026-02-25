@@ -1,0 +1,122 @@
+import ErrorHandler from "../Middlewares/errorMiddlewares.js";
+import { catchAsyncErrors } from "../Middlewares/catchAsyncError.js";
+import database from "../Config/db.js";
+import { v2 as cloudinary } from 'cloudinary';
+
+
+export const getAllUsers = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+
+        const totalUsersResult = await database.query('SELECT COUNT(*) FROM users WHERE role = $1', ['User']);
+
+        const totalUsers = parseInt(totalUsersResult.rows[0].count);
+        const offset = (page - 1) * 10;
+        const users = await database.query('SELECT * FROM users WHERE role = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3', ['User', 10, offset]);
+
+        res.status(200).json({
+            success: true,
+            totalUsers,
+            currentPage: page,
+            users: users.rows
+        });
+
+    } catch (error) {
+        return next(new ErrorHandler(`Error fetching users: ${error}`, 500));
+    }
+});
+
+
+export const deleteUser = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const userId = req.params.id;
+
+        const deleteUser = await database.query('DELETE FROM users WHERE id = $1 RETURNING *', [userId]);
+        if(deleteUser.rows.length === 0) {
+            return next(new ErrorHandler('User not found!', 404));
+        }
+
+        const avatar = deleteUser.rows[0].avatar;
+        if(avatar?.public_id) {
+            await cloudinary.uploader.destroy(avatar.public_id);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'User Deleted!'
+        });
+
+    } catch (error) {
+        return next(new ErrorHandler(`Error deleting uesr: ${error}`), 500);
+    }
+});
+
+
+export const dashboardStats = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const today = new Date();
+        const todayDate = today.toISOString().split('T')[0];
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayDate = yesterday.toISOString().split('T')[0];
+
+        const currentMonthStat = new Date(today.getFullYear(), today.getMonth(), 1);
+        const previousMonthStat = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+
+        const previousMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+
+        const totalRevenueAllTimeQuery = await database.query(`SELECT SUM(total_price) FROM orders`);
+
+        const totalRevenueAllTime = parseFloat(totalRevenueAllTimeQuery.rows[0].sum) || 0;
+
+        // Total users
+        const totalUsersCountQuery = await database.query(`SELECT COUNT(*) FROM users WHERE role = 'User'`); 
+
+        const totalUsersCount = parseInt(totalUsersCountQuery.rows[0].count) || 0;
+
+        // Total Order Status Counts
+        const orderStatusCountsQuery = await database.query(`SELECT order_status, COUNT(*) FROM orders GROUP BY order_status`);
+
+        const orderStatusCounts = {
+            Processing: 0,
+            Shipped: 0,
+            Delivered: 0,
+            Cancelled: 0
+        };
+
+        orderStatusCountsQuery.rows.forEach((row) => {
+            orderStatusCounts[row.order_status] = parseInt(row.count);
+        });
+
+        // Today's Revenue
+        const todayRevenueQuery = await database.query(`SELECT SUM(total_price) FROM orders WHERE DATE(created_at) = $1`, [todayDate]);
+
+        const todayRevenue = parseFloat(todayRevenueQuery.rows[0].sum) || 0;
+
+        // Yesterday's Revenue
+        const yesterdayRevenueQuery = await database.query(`SELECT SUM(total_price) FROM orders WHERE DATE(created_at) = $1`, [yesterdayDate]);
+
+        const yesterdayRevenue = parseFloat(yesterdayRevenueQuery.rows[0].sum) || 0;
+
+        // Monthly Sales for Line Chart
+        const monthlySalesQuery = await database.query(`
+            SELECT TO_CHAR(created_at, 'Mon YYYY') as month,
+            DATE_TRUNC('month', created_at) as date,
+            SUM(total_price) as total_sales
+            FROM orders GROUP BY month, date
+            ORDER BY date ASC
+        `);
+
+        const monthlySales = monthlySalesQuery.rows.map((row) => ({
+            month: row.month,
+            totalSales: parseFloat(row.totalSales) || 0,
+        }));
+
+
+        // Top 5 most sold products
+
+
+    } catch (error) {
+        return next(new ErrorHandler(`Error fetching dashboard stats: ${error}`, 500));
+    }
+});
