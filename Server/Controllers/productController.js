@@ -456,18 +456,20 @@ export const fetchAIFilteredProducts = catchAsyncErrors(async (req, res, next) =
         // STEP: 2 - AI Filtering 
         const aiResult = await getAIRecommendation(userPrompt, filteredProducts);
         
-        if(!aiResult.success) {
-            return res.status(400).json({
-                success: false,
-                message: aiResult.message || 'AI filtering failed'
+        if(aiResult.success) {
+            return res.status(200).json({
+                success: true,
+                message: 'AI Filtered Products Fetched!',
+                products: aiResult.products
             });
         }
-
-        res.status(200).json({
+        
+        // If AI fails, return filtered products as fallback
+        return res.status(200).json({
             success: true,
-            message: 'AI Filtered Products Fetched!',
-            products: aiResult.products
-        })
+            message: 'AI service unavailable. Showing filtered results.',
+            products: filteredProducts.slice(0, 10)
+        });
 
     } catch (error) {
         return next(new ErrorHandler(`AI-Filtered-Products Error: ${error}`, 500));
