@@ -57,12 +57,13 @@ export const dashboardStats = catchAsyncErrors(async (req, res, next) => {
         const today = new Date();
         const todayDate = today.toISOString().split('T')[0];
         const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
+        yesterday.setDate(today.getDate() - 1);
         const yesterdayDate = yesterday.toISOString().split('T')[0];
 
-        const currentMonthStat = new Date(today.getFullYear(), today.getMonth(), 1);
-        const previousMonthStat = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-
+        const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const currentMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        
+        const previousMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
         const previousMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
 
         const totalRevenueAllTimeQuery = await database.query(`SELECT SUM(total_price) FROM orders`);
@@ -102,7 +103,7 @@ export const dashboardStats = catchAsyncErrors(async (req, res, next) => {
         const monthlySalesQuery = await database.query(`
             SELECT TO_CHAR(created_at, 'Mon YYYY') as month,
             DATE_TRUNC('month', created_at) as date,
-            SUM(total_price) as total_sales
+            SUM(total_price) as totalSales
             FROM orders GROUP BY month, date
             ORDER BY date ASC
         `);
@@ -114,7 +115,75 @@ export const dashboardStats = catchAsyncErrors(async (req, res, next) => {
 
 
         // Top 5 most sold products
+        const topSellingProductsQuery = await database.query(`
+            SELECT p.name, 
+            p.images->0->>'url' as image,
+            p.category,
+            p.ratings,
+            SUM(oi.quantity) as total_sold
+            FROM order_items oi
+            JOIN products p ON oi.product_id = p.id
+            GROUP BY p.name, p.images, p.category, p.ratings
+            ORDER BY total_sold DESC
+            LIMIT 5
+        `);
 
+        const topProducts = topSellingProductsQuery.rows;
+        
+        // Total Sales of Current Month
+        const currentMonthSalesQuery = await database.query(`
+            SELECT SUM(total_price) AS total FROM orders
+            WHERE created_at BETWEEN $1 AND $2
+        `, [currentMonthStart, currentMonthEnd]);
+
+        const currentMonthSales = parseFloat(currentMonthSalesQuery.rows[0].total) || 0;
+
+        // Products with stock less than or equal to 5
+        const lowStockProductsQuery = await database.query(`
+            SELECT name, stock FROM products WHERE stock <= 5  
+        `);
+
+        const lowStockProducts = lowStockProductsQuery.rows;
+
+        // Revenue Growth Rate (%)
+        const lastMonthRevenueQuery = await database.query(`
+            SELECT SUM(total_price) AS total 
+            FROM orders
+            WHERE created_at BETWEEN $1 AND $2
+        `, [previousMonthStart, previousMonthEnd]);
+
+        const lastMonthRevenue = parseFloat(lastMonthRevenueQuery.rows[0].total) || 0;
+
+        let revenueGrowth = '0%';
+        if(lastMonthRevenue > 0) {
+            const growthRate = ((currentMonthSales - lastMonthRevenue) / lastMonthRevenue) * 100;
+            revenueGrowth = `${growthRate >= 0 ? '+' : ''}${growthRate.toFixed(2)}%`;
+        }
+
+        // New User this month
+        const newUsersThisMonthQuery = await database.query(`
+            SELECT COUNT(*) FROM users WHERE created_at >= $1 AND role = 'User'
+        `, [currentMonthStart]);
+
+        const newUsersThisMonth = parseInt(newUsersThisMonthQuery.rows[0].count) || 0;
+
+
+        // Final Response
+        res.status(200).json({
+            success: true,
+            message: 'Dashboard Stats Fetched!',
+            totalRevenueAllTime,
+            todayRevenue,
+            yesterdayRevenue,
+            totalUsersCount,
+            orderStatusCounts,
+            monthlySales, 
+            currentMonthSales,
+            topProducts,
+            lowStockProducts,
+            revenueGrowth,
+            newUsersThisMonth
+        });
 
     } catch (error) {
         return next(new ErrorHandler(`Error fetching dashboard stats: ${error}`, 500));
