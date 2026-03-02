@@ -8,7 +8,7 @@ import { generateEmail } from "../Utils/generateForgotPasswordEmailTemplate.js";
 import { sendEmail } from "../Utils/sendEmail.js";
 import crypto from 'crypto';
 import {v2 as cloudinary} from 'cloudinary';
-
+import fs from 'fs';
 
 export const register = catchAsyncErrors(async (req, res, next) => {
     try {
@@ -225,23 +225,28 @@ export const updateProfile = catchAsyncErrors(async (req, res, next) => {
             if(req.user.avatar?.public_id) {
                 await cloudinary.uploader.destroy(req.user.avatar?.public_id);
             }
-    
+
             const newProfileImage = await cloudinary.uploader.upload(avatar.tempFilePath, {
                 folder: 'Ecommerce_Avatars',
                 width: 150,
                 crop: 'scale'
             });
-    
+
             avatarData = {
                 public_id: newProfileImage?.public_id,
                 url: newProfileImage?.secure_url
             };
+
+            // Delete temp file after successful upload
+            fs.unlink(avatar.tempFilePath, (err) => {
+                if (err) console.error('Error deleting temp file:', err);
+            });
         }
-    
+
         let user;
         if(Object.keys(avatarData).length === 0) {
             user = await database.query('UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING *', [name, email, req.user.id]);
-    
+
         } else {
             user = await database.query('UPDATE users SET name = $1, email = $2, avatar = $3 WHERE id = $4 RETURNING *', [name, email, avatarData, req.user.id]);
         }

@@ -3,7 +3,7 @@ import ErrorHandler from "../Middlewares/errorMiddlewares.js";
 import {v2 as cloudinary} from 'cloudinary';
 import database from "../Config/db.js";
 import { getAIRecommendation } from "../Utils/getAIRecommendation.js";
-
+import fs from 'fs';
 
 export const createProduct = catchAsyncErrors(async (req, res, next) => {
     try {
@@ -28,6 +28,11 @@ export const createProduct = catchAsyncErrors(async (req, res, next) => {
                 uploadedImages.push({
                     url: result.secure_url,
                     public_id: result.public_id
+                });
+                
+                // Delete temp file after successful upload
+                fs.unlink(image.tempFilePath, (err) => {
+                    if (err) console.error('Error deleting temp file:', err);
                 });
             }
         }
