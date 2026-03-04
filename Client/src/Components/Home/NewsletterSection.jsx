@@ -23,7 +23,7 @@ const NewsletterSection = () => {
                     <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
                         <div className="relative flex-1">
                             <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                            <input
+                            <input 
                                 type="email"
                                 placeholder="Enter your email address"
                                 value={email}
