@@ -2,6 +2,7 @@ import React from "react";
 import { Star, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { addToCart } from "../../Redux/cartSlice";
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
