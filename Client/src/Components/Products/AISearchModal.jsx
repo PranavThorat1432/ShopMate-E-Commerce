@@ -30,7 +30,6 @@ const AISearchModal = () => {
   return (
     <div
       className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-      onClick={() => dispatch(toggleAIModal())}
     >
       <div
         className="bg-background/95 backdrop-blur-md border border-border rounded-2xl p-8 w-full max-w-2xl"
