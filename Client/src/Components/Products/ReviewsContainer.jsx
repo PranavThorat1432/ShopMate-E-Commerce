@@ -35,7 +35,7 @@ const ReviewsContainer = ({ product, productReviews }) => {
                     key={index} 
                     type="button" 
                     onClick={() => setRating(index + 1)} 
-                    className={`text-2xl ${index < rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                    className={`text-2xl ${index < rating ? 'text-yellow-400' : 'text-gray-300'} cursor-pointer`}
                   >
                     ☆
                   </button>
@@ -48,13 +48,13 @@ const ReviewsContainer = ({ product, productReviews }) => {
               onChange={(e) => setComment(e.target.value)}
               rows={4}
               placeholder="Write your review..."
-              className="w-full p-3 rounded-md border-border bg-background text-foreground"
+              className="w-full p-3 rounded-md border-border bg-background text-foreground border-2"
             />
               
             <button
               type="submit"
               disabled={isPostingReview}
-              className="px-6 py-2 rounded-lg bg-primary text-white font-semibold hover:glow-on-hover animate-smooth disabled: opacity-50"
+              className="px-6 py-2 rounded-lg bg-primary text-primary-foreground cursor-pointer font-semibold hover:glow-on-hover animate-smooth disabled: opacity-50"
             >
               {isPostingReview ? (
                 'Submitting...'
@@ -98,7 +98,7 @@ const ReviewsContainer = ({ product, productReviews }) => {
                       <p className="text-muted-foreground mb-2">{review.comment}</p>
                       {
                         authUser?.id === review?.reviewer?.id && (
-                          <button onClick={() => dispatch(deleteReview(product.id, review.review_id))} className="my-6 w-fit flex items-center space-x-3 p-3 rounded-lg glass-card hover:glow-on-hover text-destructive hover:text-destructive-foreground group">
+                          <button onClick={() => dispatch(deleteReview(product.id, review.review_id))} className="my-6 w-fit flex items-center space-x-3 p-3 rounded-lg glass-card hover:glow-on-hover text-destructive hover:text-destructive-foreground group cursor-pointer">
                             {isReviewDeleting ? (
                               <>
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"> {' '}
