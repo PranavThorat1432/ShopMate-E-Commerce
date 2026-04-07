@@ -69,6 +69,7 @@ const CartSidebar = () => {
                             {/* Quantity Controls */}
                             <div className="flex items-center space-x-2 mt-2">
                               <button 
+                              disabled={item.quantity === 1}
                                 className="p-1 rounded glass-card hover:glow-on-hover animate-smooth cursor-pointer" 
                                 onClick={() => {
                                   updateQuantity(item.product.id, item.quantity - 1)}
