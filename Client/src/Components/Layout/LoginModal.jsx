@@ -36,7 +36,7 @@ const LoginModal = () => {
     data.append('password', formData.password);
 
     if(mode === 'signup') {
-      data.append('name'. formData.name);
+      data.append('name', formData.name);
     }
     if(mode === 'forgot') {
       dispatch(forgotPassword({email: formData.email})).then(() => {
@@ -51,13 +51,15 @@ const LoginModal = () => {
       return;
     }
     if(mode === 'signup') {
-      dispatch(register(data));
+      dispatch(register(data)).then(() => {
+        // Clear form after registration
+        setFormData({name: '', email: '', password: '', confirmPassword: ''});
+      });
     } else {
-      dispatch(login(data));
-    }
-
-    if(authUser) {
-      setFormData({name: '', email: '', password: '', confirmPassword: ''});
+      dispatch(login(data)).then(() => {
+        // Clear form after login
+        setFormData({name: '', email: '', password: '', confirmPassword: ''});
+      });
     }
   };
 
