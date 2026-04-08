@@ -18,6 +18,7 @@ const ReviewsContainer = ({ product, productReviews }) => {
     const data = new FormData();
     data.append('rating', rating);
     data.append('comment', comment);
+    setComment('');
 
     dispatch(postReview({productId: product.id, review: data}));
   };
@@ -75,30 +76,30 @@ const ReviewsContainer = ({ product, productReviews }) => {
                 <div key={review.review_id} className="glass-card p-6">
                   <div className="flex items-center space-x-4">
                     <img 
-                      src={review?.reviewer.avatar.url || '/avatar-holder.avif'} 
-                      alt={review?.reviewer.name} 
+                      src={review?.reviewer?.avatar?.url || '/avatar-holder.avif'} 
+                      alt={review?.reviewer?.name} 
                       className="w-12 h-12 rounded-full text-foreground"
                     />
 
                     <div className="flex-1">
                       <div className="flex items-center space-x-4 mb-2">
-                        <h4 className="font-semibold text-foreground">{review?.reviewer.name}</h4>
+                        <h4 className="font-semibold text-foreground">{review?.reviewer?.name}</h4>
                         <div className="flex">
                           {[...Array(5)].map((_, index) => {
                             return (
                               <Star
                                 key={index}
-                                className={`w-4 h-4 ${index < Math.floor(product.ratings) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+                                className={`w-4 h-4 ${index < Math.floor(review?.rating) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
                               />
                             );
                           })}
                         </div>
                       </div>
 
-                      <p className="text-muted-foreground mb-2">{review.comment}</p>
+                      <p className="text-muted-foreground mb-2">{review?.comment}</p>
                       {
                         authUser?.id === review?.reviewer?.id && (
-                          <button onClick={() => dispatch(deleteReview(product.id, review.review_id))} className="my-6 w-fit flex items-center space-x-3 p-3 rounded-lg glass-card hover:glow-on-hover text-destructive hover:text-destructive-foreground group cursor-pointer">
+                          <button onClick={() => dispatch(deleteReview({productId: product.id, reviewId: review?.review_id}))} className="my-6 w-fit flex items-center space-x-3 p-3 rounded-lg glass-card hover:glow-on-hover text-destructive hover:text-destructive-foreground group cursor-pointer">
                             {isReviewDeleting ? (
                               <>
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"> {' '}
