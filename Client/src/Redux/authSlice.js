@@ -3,7 +3,7 @@ import { axiosInstance } from "../lib/axios.js";
 import { toast } from "react-toastify";
 import { toggleAuthPopup } from "./PopupSlice.js";
 
-const FRONTEND_URL = import.meta.env.FRONTEND_URL || 'http://localhost:5173';
+const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
 
 export const register = createAsyncThunk('auth/register', async (userData, thunkAPI) => {
     try {
