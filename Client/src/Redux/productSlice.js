@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../lib/axios";
 import { toast } from "react-toastify";
 import { toggleAIModal } from "./PopupSlice";
+import { useSelector } from "react-redux";
+
 
 
 export const fetchAllProducts = createAsyncThunk('/product/fetchAll', 
@@ -53,10 +55,16 @@ export const fetchProductDetails = createAsyncThunk('/product/singleProduct',
 
 export const postReview = createAsyncThunk('/product/postReview', 
   async ({productId, review}, thunkAPI) => {
+    
+    const state = thunkAPI.getState();
+    const authUser = state.auth.authUser;
     try {
       const result = await axiosInstance.put(`/api/products/post-review/${productId}`, review);
       toast.success(result.data.message);
-      return result.data.review;
+      return {
+        review: result.data.review,
+        authUser
+      };
 
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add review!');
@@ -84,7 +92,7 @@ export const deleteReview = createAsyncThunk('/product/deleteReview',
 export const fetchProductWithAI = createAsyncThunk('/product/productAISearch', 
   async (userPrompt, thunkAPI) => {
     try {
-      const result = await axiosInstance.post(`/api/products/ai-search`, userPrompt);
+      const result = await axiosInstance.post(`/api/products/ai-search`, {userPrompt});
       thunkAPI.dispatch(toggleAIModal());
       return result.data;
       
@@ -94,6 +102,7 @@ export const fetchProductWithAI = createAsyncThunk('/product/productAISearch',
     }
   }
 );
+
 
 const productSlice = createSlice({
   name: "product",
@@ -130,7 +139,7 @@ const productSlice = createSlice({
       .addCase(fetchProductDetails.fulfilled, (state, action) => {
         state.loading = false;
         state.productDetails = action.payload;
-        state.productDetails = action.payload.reviews;
+        state.productReviews = action.payload.reviews;
       })
       .addCase(fetchProductDetails.rejected, (state) => {
         state.loading = false;
@@ -140,7 +149,27 @@ const productSlice = createSlice({
       })
       .addCase(postReview.fulfilled, (state, action) => {
         state.isPostingReview = false;
-        state.productReviews = [action.payload, ...state.productReviews];
+        const newReview = action.payload.review;
+        const authUser = action.payload.authUser;
+
+        const existingReviewIndex = state.productReviews.findIndex((review) => review?.reviewer?.id === newReview?.user_id)
+        if(existingReviewIndex !== -1) {
+          state.productReviews[existingReviewIndex].rating = Number(newReview.rating);
+          state.productReviews[existingReviewIndex].comment = newReview.comment;
+
+        } else {
+          state.productReviews = [
+            {
+              ...newReview,
+              reviewer: {
+                id: authUser?.id,
+                name: authUser?.name,
+                avatar: authUser?.avatar?.url
+              },
+            },
+            ...state.productReviews,
+          ]
+        }
       })
       .addCase(postReview.rejected, (state) => {
         state.isPostingReview = false;
