@@ -22,7 +22,7 @@ export async function generatePaymentIntent(orderId, totalPrice) {
         console.error('Payment Error: ', error);
         return {
             success: false,
-            message: 'Pyament failed: ' + (error.message || error)
+            message: 'Payment failed: ' + (error.message || error)
         };
     }
 };
