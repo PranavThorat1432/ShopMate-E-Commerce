@@ -66,7 +66,7 @@ export const dashboardStats = catchAsyncErrors(async (req, res, next) => {
         const previousMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
         const previousMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
 
-        const totalRevenueAllTimeQuery = await database.query(`SELECT SUM(total_price) FROM orders`);
+        const totalRevenueAllTimeQuery = await database.query(`SELECT SUM(total_price) FROM orders WHERE paid_at IS NOT NULL`);
 
         const totalRevenueAllTime = parseFloat(totalRevenueAllTimeQuery.rows[0].sum) || 0;
 
@@ -76,7 +76,9 @@ export const dashboardStats = catchAsyncErrors(async (req, res, next) => {
         const totalUsersCount = parseInt(totalUsersCountQuery.rows[0].count) || 0;
 
         // Total Order Status Counts
-        const orderStatusCountsQuery = await database.query(`SELECT order_status, COUNT(*) FROM orders GROUP BY order_status`);
+        const orderStatusCountsQuery = await database.query(
+            `SELECT order_status, COUNT(*) FROM orders WHERE paid_at IS NOT NULL GROUP BY order_status`
+        );
 
         const orderStatusCounts = {
             Processing: 0,
@@ -90,12 +92,16 @@ export const dashboardStats = catchAsyncErrors(async (req, res, next) => {
         });
 
         // Today's Revenue
-        const todayRevenueQuery = await database.query(`SELECT SUM(total_price) FROM orders WHERE DATE(created_at) = $1`, [todayDate]);
+        const todayRevenueQuery = await database.query(`
+            SELECT SUM(total_price) FROM orders WHERE DATE(created_at) = $1 AND paid_at IS NOT NULL`, [todayDate]
+        );
 
         const todayRevenue = parseFloat(todayRevenueQuery.rows[0].sum) || 0;
 
         // Yesterday's Revenue
-        const yesterdayRevenueQuery = await database.query(`SELECT SUM(total_price) FROM orders WHERE DATE(created_at) = $1`, [yesterdayDate]);
+        const yesterdayRevenueQuery = await database.query(`
+            SELECT SUM(total_price) FROM orders WHERE DATE(created_at) = $1 AND paid_at IS NOT NULL`, [yesterdayDate]
+        );
 
         const yesterdayRevenue = parseFloat(yesterdayRevenueQuery.rows[0].sum) || 0;
 
@@ -103,14 +109,15 @@ export const dashboardStats = catchAsyncErrors(async (req, res, next) => {
         const monthlySalesQuery = await database.query(`
             SELECT TO_CHAR(created_at, 'Mon YYYY') as month,
             DATE_TRUNC('month', created_at) as date,
-            SUM(total_price) as totalSales
-            FROM orders GROUP BY month, date
+            SUM(total_price) as totalsales
+            FROM orders WHERE paid_at IS NOT NULL
+            GROUP BY month, date
             ORDER BY date ASC
         `);
 
         const monthlySales = monthlySalesQuery.rows.map((row) => ({
             month: row.month,
-            totalSales: parseFloat(row.totalSales) || 0,
+            totalsales: parseFloat(row.totalsales) || 0,
         }));
 
 
@@ -132,8 +139,9 @@ export const dashboardStats = catchAsyncErrors(async (req, res, next) => {
         
         // Total Sales of Current Month
         const currentMonthSalesQuery = await database.query(`
-            SELECT SUM(total_price) AS total FROM orders
-            WHERE created_at BETWEEN $1 AND $2
+            SELECT SUM(total_price) AS total 
+            FROM orders 
+            WHERE paid_at IS NOT NULL AND created_at BETWEEN $1 AND $2 
         `, [currentMonthStart, currentMonthEnd]);
 
         const currentMonthSales = parseFloat(currentMonthSalesQuery.rows[0].total) || 0;
@@ -149,7 +157,7 @@ export const dashboardStats = catchAsyncErrors(async (req, res, next) => {
         const lastMonthRevenueQuery = await database.query(`
             SELECT SUM(total_price) AS total 
             FROM orders
-            WHERE created_at BETWEEN $1 AND $2
+            WHERE paid_at IS NOT NULL AND created_at BETWEEN $1 AND $2
         `, [previousMonthStart, previousMonthEnd]);
 
         const lastMonthRevenue = parseFloat(lastMonthRevenueQuery.rows[0].total) || 0;
