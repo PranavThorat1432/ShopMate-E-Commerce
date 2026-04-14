@@ -176,7 +176,7 @@ export const fetchMyOrders = catchAsyncErrors(async (req, res, next) => {
             FROM orders o
             LEFT JOIN order_items oi ON o.id = oi.order_id
             LEFT JOIN shipping_info s ON o.id = s.order_id
-            WHERE o.buyer_id = $1
+            WHERE o.buyer_id = $1 AND o.paid_at IS NOT NULL
             GROUP BY o.id, s.id
         `, [req.user.id]);
 
@@ -222,6 +222,7 @@ export const fetchAllOrders = catchAsyncErrors(async (req, res, next) => {
                 FROM orders o
                 LEFT JOIN order_items oi ON o.id = oi.order_id
                 LEFT JOIN shipping_info s ON o.id = s.order_id
+                WHERE o.paid_at IS NOT NULL
                 GROUP BY o.id, s.id
             `, []
         );
@@ -233,7 +234,7 @@ export const fetchAllOrders = catchAsyncErrors(async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: 'All Orders Fetched!',
-            allOrders: result.rows
+            orders: result.rows
         });
 
     } catch (error) {
