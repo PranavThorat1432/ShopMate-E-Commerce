@@ -46,7 +46,7 @@ export const createProduct = catchAsyncErrors(async (req, res, next) => {
         });
         
     } catch (error) {
-        return next(new ErrorHandler(`Create Product Error: ${error}`, 500));
+        return next(new ErrorHandler(`Create Product Error: ${error.message || error}`, 500));
 
     }
 });
@@ -129,7 +129,9 @@ export const fetchAllProducts = catchAsyncErrors(async (req, res, next) => {
         const result = await database.query(query, values);
     
         // Query for Fetching new products
-        const newProductsQuery = `SELECT products.*, COUNT(reviews.id) AS review_count FROM products LEFT JOIN reviews ON products.id = reviews.product_id WHERE products.created_at >= NOW() - INTERVAL '30 days' GROUP BY products.id ORDER BY products.created_at DESC LIMIT 8`;
+        const newProductsQuery = `
+            SELECT products.*, COUNT(reviews.id) AS review_count FROM products LEFT JOIN reviews ON products.id = reviews.product_id WHERE products.created_at >= NOW() - INTERVAL '30 days' GROUP BY products.id ORDER BY products.created_at DESC LIMIT 8
+        `;
     
         const newProductsResults = await database.query(newProductsQuery);
     
@@ -147,7 +149,7 @@ export const fetchAllProducts = catchAsyncErrors(async (req, res, next) => {
         }); 
         
     } catch (error) {
-        return next(new ErrorHandler(`Fetch-All-Products Error: ${error}`, 500));
+        return next(new ErrorHandler(`Fetch-All-Products Error: ${error.message || error}`, 500));
 
     }
 });
@@ -176,7 +178,7 @@ export const updateProduct = catchAsyncErrors(async (req, res, next) => {
         });
         
     } catch (error) {
-        return next(new ErrorHandler(`Update Product Error: ${error}`, 500));
+        return next(new ErrorHandler(`Update Product Error: ${error.message || error}`, 500));
 
     }
 });
@@ -196,7 +198,7 @@ export const deleteProduct = catchAsyncErrors(async (req, res, next) => {
         const deleteResult = await database.query('DELETE FROM products WHERE id = $1 RETURNING *', [productId]);
         
         if(deleteResult.rows.length === 0) {
-            return next(new ErrorHandler('Failed to delete product., 500'));
+            return next(new ErrorHandler('Failed to delete product.', 500));
         }
         
         // Delete images from cloudinary
@@ -212,7 +214,7 @@ export const deleteProduct = catchAsyncErrors(async (req, res, next) => {
         });
 
     } catch (error) {
-        return next(new ErrorHandler(`Delete Product Error: ${error}`, 500));
+        return next(new ErrorHandler(`Delete Product Error: ${error.message || error}`, 500));
     }
 });
 
@@ -248,7 +250,7 @@ export const fetchSingleProduct = catchAsyncErrors(async (req, res, next) => {
         });
 
     } catch (error) {
-        return next(new ErrorHandler('Fetch-Single-Product Error: ' + error, 500));
+        return next(new ErrorHandler('Fetch-Single-Product Error: ' + (error.message || error), 500));
     }
 });
 
@@ -309,7 +311,7 @@ export const postProductReview = catchAsyncErrors(async (req, res, next) => {
         });
         
     } catch (error) {
-        return next(new ErrorHandler(`Post-Product-Review Error: ${error}`, 500));
+        return next(new ErrorHandler(`Post-Product-Review Error: ${error.message || error}`, 500));
     }
 });
 
@@ -337,7 +339,7 @@ export const deleteReview = catchAsyncErrors(async (req, res, next) => {
         });
 
     } catch (error) {
-        return next(new ErrorHandler(`Delete-Review Error: ${error}`, 500));
+        return next(new ErrorHandler(`Delete-Review Error: ${error.message || error}`, 500));
     }
 });
 
@@ -477,6 +479,6 @@ export const fetchAIFilteredProducts = catchAsyncErrors(async (req, res, next) =
         });
 
     } catch (error) {
-        return next(new ErrorHandler(`AI-Filtered-Products Error: ${error}`, 500));
+        return next(new ErrorHandler(`AI-Filtered-Products Error: ${error.message || error}`, 500));
     }
 });
