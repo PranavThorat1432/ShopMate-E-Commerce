@@ -24,7 +24,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 py-4">
           <TopSellingProducts/>
           <div>
-            <MiniSummary />
+            <MiniSummary /> 
           </div>
         </div>
       </div>
