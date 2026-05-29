@@ -280,7 +280,7 @@
 - `total_price` (DECIMAL)
 - `paid_at` (TIMESTAMP)
 - `created_at` (TIMESTAMP)
-
+ 
 **Order Items Table**
 - `id` (UUID, Primary Key)
 - `order_id` (UUID, Foreign Key)
