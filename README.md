@@ -287,7 +287,7 @@
 - `product_id` (UUID, Foreign Key)
 - `quantity` (INTEGER)
 - `price` (DECIMAL)
-
+ 
 **Payments Table**
 - `id` (UUID, Primary Key)
 - `order_id` (UUID, Foreign Key)
