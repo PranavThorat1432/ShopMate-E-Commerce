@@ -415,7 +415,7 @@ GRANT ALL PRIVILEGES ON DATABASE ShopMate_Ecommerce TO shopmate;
 
 # Exit
 \q
-```
+```  
 
 #### 3. External Services Setup
 
