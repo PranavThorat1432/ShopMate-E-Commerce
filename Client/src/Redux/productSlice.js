@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../lib/axios";
 import { toast } from "react-toastify";
-import { toggleAIModal } from "./PopupSlice";
+import { toggleAIModal } from "./popupSlice";
 import { useSelector } from "react-redux";
 
 

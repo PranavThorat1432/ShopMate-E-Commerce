@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../lib/axios.js";
 import { toast } from "react-toastify";
-import { toggleAuthPopup } from "./PopupSlice.js";
+import { toggleAuthPopup } from "./popupSlice.js";
 
 const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
 
