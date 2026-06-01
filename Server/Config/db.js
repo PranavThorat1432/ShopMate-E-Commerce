@@ -5,11 +5,14 @@ dotenv.config();
 const { Client } = pkg;
 
 const database = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'ShopMate_Ecommerce',
-    password: process.env.DB_PASS,
-    port: 5432,
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+    ssl: {
+        required: true
+    }
 });
 
 try {
