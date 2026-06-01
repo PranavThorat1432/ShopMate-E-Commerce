@@ -1,7 +1,7 @@
 import { Menu, User, ShoppingCart, Sun, Moon, Search } from "lucide-react";
 import { useTheme } from "../../Context/ThemeContext";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleAuthPopup, toggleCart, toggleSearchBar, toggleSidebar } from "../../Redux/PopupSlice";
+import { toggleAuthPopup, toggleCart, toggleSearchBar, toggleSidebar } from "../../Redux/popupSlice";
 import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {

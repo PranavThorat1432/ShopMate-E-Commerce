@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { fetchAllProducts } from "../Redux/productSlice";
-import { toggleAIModal } from "../Redux/PopupSlice";
+import { toggleAIModal } from "../Redux/popupSlice";
 
 const Products = () => {
 

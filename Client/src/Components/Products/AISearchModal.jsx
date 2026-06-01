@@ -3,7 +3,7 @@ import { X, Search, Sparkles } from "lucide-react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductWithAI } from "../../Redux/productSlice";
-import { toggleAIModal } from "../../Redux/PopupSlice";
+import { toggleAIModal } from "../../Redux/popupSlice";
 
 const AISearchModal = () => {
 

@@ -2,7 +2,7 @@ import { X, Plus, Minus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { removeFromCart, updateCartQuantity } from "../../Redux/cartSlice";
-import { toggleCart } from "../../Redux/PopupSlice";
+import { toggleCart } from "../../Redux/popupSlice";
 
 const CartSidebar = () => {
 

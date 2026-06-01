@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { X, Mail, Lock, User } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { toggleAuthPopup } from "../../Redux/PopupSlice";
+import { toggleAuthPopup } from "../../Redux/popupSlice";
 import { forgotPassword, login, register, resetPassword } from "../../Redux/authSlice";
 
 const LoginModal = () => {

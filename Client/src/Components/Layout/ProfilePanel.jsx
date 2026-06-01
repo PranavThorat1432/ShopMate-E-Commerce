@@ -3,7 +3,7 @@ import { X, LogOut, Upload, Eye, EyeOff } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { logout, updatePassword, updateProfile } from "../../Redux/authSlice";
-import { toggleAuthPopup } from "../../Redux/PopupSlice";
+import { toggleAuthPopup } from "../../Redux/popupSlice";
 
 const ProfilePanel = () => {
 
