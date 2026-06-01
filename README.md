@@ -1454,7 +1454,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE
 | Platform              | Link                                                          |
 | --------------------- | ------------------------------------------------------------- |
 | 🧑 **Author**      | Pranav Thorat                      |
-| 🌐 **Live Demo**      | Yet to Deploy                        |
+| 🌐 **Live Demo**      | [Live](https://shopmate-e-commerce.onrender.com)                        |
 | 🧑‍💻 **GitHub Repo** | [View Code](https://github.com/PranavThorat1432/ShopMate-E-Commerce) |
 | 💼 **LinkedIn**       | [Connect with Me](https://www.linkedin.com/in/curiouspranavthorat)       |
 | 📩 **Email**          | [pranavthorat95@gmail.com](mailto:pranavthorat95@gmail.com)   |
